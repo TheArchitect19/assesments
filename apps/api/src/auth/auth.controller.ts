@@ -24,7 +24,7 @@ import axios from 'axios';
 export class AuthController {
   constructor(private readonly authService: AuthService,
     private jwtService: JwtService
-    ) { }
+  ) { }
 
   @Post('signup')
   @ApiOperation({
@@ -94,19 +94,15 @@ export class AuthController {
   @Post('google/login')
   async googleLogin(@Body() body: { token: string }, @Res() res: Response) {
     try {
-      // Verify the Google token (exchange it for access token)
+
       const { data } = await axios.post('https://oauth2.googleapis.com/tokeninfo', {
         id_token: body.token,
       });
 
-      // Use the user information from Google
-      console.log(data)
       const user = await this.authService.findOrCreateGoogleUser(data);
+      const jwtToken = this.jwtService.sign({ userId: user.id });
 
-      // Generate a JWT token for the user
-      const jwtToken = this.jwtService.sign({ userId: user._id });
 
-      // Respond with the JWT token
       return res.json({ token: jwtToken });
     } catch (error) {
       console.error('Error during Google login:', error);

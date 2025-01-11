@@ -1,29 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schema/user.model';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './schema/user.model';
 import { UpdateUserDTO } from './dto/user.dto';
 
-/**
- * Service responsible for user-related operations.
- */
+
 @Injectable()
 export class UserService {
   /**
    * Constructor for UserService.
-   * @param userModel - The Mongoose model for the User entity.
+   * @param userRepository - The TypeORM repository for the User entity.
    */
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   /**
    * Retrieves all users.
    * @returns A promise that resolves to an array of User entities.
    */
-  async findAll(): Promise<UserDocument[]> {
-    const users = await this.userModel.find();
-    return users;
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
   /**
@@ -31,9 +29,8 @@ export class UserService {
    * @param id - The ID of the user to retrieve.
    * @returns A promise that resolves to the User entity or null if not found.
    */
-  async findOne(id: string): Promise<UserDocument | null> {
-    const user = await this.userModel.findById(id);
-    return user;
+  async findOne(id: number): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
   }
 
   /**
@@ -42,14 +39,9 @@ export class UserService {
    * @param update - The data to update the user with.
    * @returns A promise that resolves to the updated User entity or null if not found.
    */
-  async update(
-    id: string,
-    update: UpdateUserDTO,
-  ): Promise<UserDocument | null> {
-    const user = await this.userModel.findByIdAndUpdate(id, update, {
-      new: true,
-    });
-    return user;
+  async update(id: number, update: UpdateUserDTO): Promise<User | null> {
+    await this.userRepository.update(id, update);
+    return this.userRepository.findOne({ where: { id } });
   }
 
   /**
@@ -57,8 +49,11 @@ export class UserService {
    * @param id - The ID of the user to remove.
    * @returns A promise that resolves to the removed User entity or null if not found.
    */
-  async remove(id: string): Promise<UserDocument | null> {
-    const user = await this.userModel.findByIdAndDelete(id);
+  async remove(id: number): Promise<User | null> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (user) {
+      await this.userRepository.remove(user);
+    }
     return user;
   }
 }

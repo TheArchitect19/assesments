@@ -6,7 +6,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 
 async function bootstrap() {
-  
+
   const app = await NestFactory.create(AppModule);
   app.use(cors());
   app.use(bodyParser.json({ limit: '50mb' }));
@@ -18,7 +18,7 @@ async function bootstrap() {
     .setDescription('API for the assessment.')
     .setVersion('1.0')
     .addTag('nestjs')
-    .addBearerAuth() // for auth
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

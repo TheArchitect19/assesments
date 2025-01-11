@@ -26,14 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
+    // <AuthProvider>
     <html lang="en">
-      <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID || ''}>
+      <GoogleOAuthProvider clientId="122876537399-t7l16oldiln8eill19a5gsr9m3va02ru.apps.googleusercontent.com">
+        
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
         </body>
       </GoogleOAuthProvider>
     </html>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }

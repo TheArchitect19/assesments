@@ -6,6 +6,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
+  console.log(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
+  console.log(process.env.DB_NAME)
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +36,7 @@ export default function Home() {
         email: email,
         password: password,
       });
-      console.log("Sign Up Success! Token: " + response.data.token);
+      console.log("Sign Up Success! Token: " + response.data.data.token);
     } catch (error: any) {
       console.error("Sign Up Failed: " + error.response?.data?.message || error.message);
     }
