@@ -22,9 +22,10 @@ import axios from 'axios';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService,
-    private jwtService: JwtService
-  ) { }
+  constructor(
+    private readonly authService: AuthService,
+    private jwtService: JwtService,
+  ) {}
 
   @Post('signup')
   @ApiOperation({
@@ -41,7 +42,7 @@ export class AuthController {
   ) {
     try {
       const data = body;
-      console.log(body)
+      console.log(body);
       const token = await this.authService.signup(data);
       return OK(res, 'Signup Success', { token }, HttpStatus.CREATED);
     } catch (error) {
@@ -80,10 +81,13 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Google Redirect', description: 'Google login redirect URI.' })
+  @ApiOperation({
+    summary: 'Google Redirect',
+    description: 'Google login redirect URI.',
+  })
   async googleAuthRedirect(@Res() res: Response, @Req() req) {
     try {
-      console.log(req.user)
+      console.log(req.user);
       const user = await this.authService.findOrCreateGoogleUser(req.user);
       const token = await this.authService.generateJwtToken(user);
       return OK(res, 'Success', { token }, HttpStatus.OK);
@@ -94,14 +98,15 @@ export class AuthController {
   @Post('google/login')
   async googleLogin(@Body() body: { token: string }, @Res() res: Response) {
     try {
-
-      const { data } = await axios.post('https://oauth2.googleapis.com/tokeninfo', {
-        id_token: body.token,
-      });
+      const { data } = await axios.post(
+        'https://oauth2.googleapis.com/tokeninfo',
+        {
+          id_token: body.token,
+        },
+      );
 
       const user = await this.authService.findOrCreateGoogleUser(data);
       const jwtToken = this.jwtService.sign({ userId: user.id });
-
 
       return res.json({ token: jwtToken });
     } catch (error) {
@@ -112,5 +117,4 @@ export class AuthController {
       });
     }
   }
-
 }
